@@ -12,363 +12,486 @@
 
 <body>
 
-  <header class="topo">
-    <div class="topo-linha">
-      <div class="topo-esquerda">
-        <img id="logo-empresa" class="logo-empresa" src="" alt="Logo da empresa" style="display:none">
-        <div>
-          <h1>🦀 Precifica+</h1>
-          <p>Precificação de cardápio, ficha técnica e ponto de equilíbrio — 100% local</p>
-        </div>
+  <!-- ================= SIDEBAR ================= -->
+  <aside class="sidebar" id="sidebar" aria-label="Menu principal">
+    <div class="sidebar-header">
+      <img id="logo-empresa" class="logo-empresa sidebar-logo" src="" alt="Logo da empresa" style="display:none">
+      <div class="sidebar-brand">
+        <span class="sidebar-brand-icon">🦀</span>
+        <span class="sidebar-brand-name">Precifica<span class="marca-plus">+</span></span>
       </div>
-      <button type="button" class="btn-tema" id="btn-tema" aria-label="Alternar tema claro/escuro"
-        title="Alternar tema">
-        <span class="tema-icone" id="tema-icone">☀️</span>
-      </button>
     </div>
+
+    <nav class="sidebar-nav" role="tablist" aria-label="Seções do sistema">
+      <button class="sidebar-item" data-vista="ingredientes" role="tab" aria-selected="false">
+        <span class="sidebar-icon">🥕</span>
+        <span class="sidebar-label">Ingredientes</span>
+      </button>
+      <button class="sidebar-item" data-vista="pratos" role="tab" aria-selected="false">
+        <span class="sidebar-icon">🍽️</span>
+        <span class="sidebar-label">Pratos</span>
+      </button>
+      <button class="sidebar-item" data-vista="faturamento" role="tab" aria-selected="false">
+        <span class="sidebar-icon">💰</span>
+        <span class="sidebar-label">Faturamento</span>
+      </button>
+      <button class="sidebar-item" data-vista="custosfixos" role="tab" aria-selected="false">
+        <span class="sidebar-icon">📉</span>
+        <span class="sidebar-label">Custos fixos / PE</span>
+      </button>
+      <button class="sidebar-item" data-vista="payback" role="tab" aria-selected="false">
+        <span class="sidebar-icon">📈</span>
+        <span class="sidebar-label">Payback Descontado</span>
+      </button>
+      <button class="sidebar-item" data-vista="relatorios" role="tab" aria-selected="false">
+        <span class="sidebar-icon">📊</span>
+        <span class="sidebar-label">Relatórios</span>
+      </button>
+      <button class="sidebar-item" data-vista="config" role="tab" aria-selected="false">
+        <span class="sidebar-icon">⚙️</span>
+        <span class="sidebar-label">Configurações</span>
+      </button>
+      <button class="sidebar-item" data-vista="importar" role="tab" aria-selected="false">
+        <span class="sidebar-icon">📥</span>
+        <span class="sidebar-label">Importar / Exportar</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button type="button" class="btn-tema sidebar-tema" id="btn-tema" aria-label="Alternar tema claro/escuro" title="Alternar tema">
+        <span class="tema-icone" id="tema-icone">☀️</span>
+        <span class="tema-label" id="tema-label">Tema</span>
+      </button>
+      <p class="sidebar-versao">100% local · sem servidor</p>
+    </div>
+  </aside>
+
+  <!-- Overlay mobile -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- ================= TOPO MOBILE ================= -->
+  <header class="topo" id="topo">
+    <button type="button" class="btn-menu" id="btn-menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+      <span class="hamburger"></span>
+    </button>
+    <div class="topo-brand">
+      <span>🦀</span>
+      <strong>Precifica<span class="marca-plus">+</span></strong>
+    </div>
+    <button type="button" class="btn-tema btn-tema-mobile" id="btn-tema-mobile" aria-label="Alternar tema">
+      <span class="tema-icone" id="tema-icone-mobile">☀️</span>
+    </button>
   </header>
 
-  <nav class="abas" id="abas" role="tablist" aria-label="Seções do sistema">
-    <button class="aba-btn" data-vista="ingredientes" role="tab">🥕 Ingredientes</button>
-    <button class="aba-btn" data-vista="pratos" role="tab">🍽️ Pratos</button>
-    <button class="aba-btn" data-vista="config" role="tab">⚙️ Configurações</button>
-    <button class="aba-btn" data-vista="custosfixos" role="tab">📉 Custos fixos / PE</button>
-    <button class="aba-btn" data-vista="payback" role="tab">📈 Payback Descontado</button>
-    <button class="aba-btn" data-vista="relatorios" role="tab">📊 Relatórios</button>
-    <button class="aba-btn" data-vista="importar" role="tab">📥 Importar / Exportar</button>
-  </nav>
+  <!-- ================= CONTEÚDO PRINCIPAL ================= -->
+  <div class="conteudo-principal" id="conteudo-principal">
+    <main>
 
-  <main>
-
-    <!-- ================= INGREDIENTES ================= -->
-    <section class="vista" id="vista-ingredientes" role="tabpanel">
-      <div class="cartao">
-        <h2>Novo ingrediente</h2>
-        <p class="subtitulo">Informe o preço e a quantidade da embalagem que você compra. O sistema calcula
-          o custo por grama/ml/unidade automaticamente — depois, ao montar o prato, você pode usar
-          esse ingrediente em qualquer unidade compatível (ex: comprou em kg, usa em gramas na receita).</p>
-        <form id="form-ingrediente" class="grade-form duas-colunas" novalidate>
-          <div class="campo">
-            <label for="ing-nome">Nome do ingrediente</label>
-            <input type="text" id="ing-nome" name="nome" required placeholder="Ex: Carne de caranguejo">
-          </div>
-          <div class="campo">
-            <label for="ing-unidade-compra">Unidade de compra</label>
-            <select id="ing-unidade-compra" name="unidadeCompra">
-              <option value="kg">Quilograma (kg)</option>
-              <option value="g">Grama (g)</option>
-              <option value="l">Litro (L)</option>
-              <option value="ml">Mililitro (ml)</option>
-              <option value="un">Unidade (un)</option>
-            </select>
-          </div>
-          <div class="campo">
-            <label for="ing-qtd-embalagem">Quantidade na embalagem</label>
-            <input type="number" id="ing-qtd-embalagem" name="qtdEmbalagem" min="0" step="0.001" value="1" required>
-          </div>
-          <div class="campo">
-            <label for="ing-custo-embalagem">Custo da embalagem (R$)</label>
-            <input type="number" id="ing-custo-embalagem" name="custoEmbalagem" min="0" step="0.01" value="0" required>
-          </div>
-          <div class="campo">
-            <label for="ing-perda">Perda / quebra (%)</label>
-            <input type="number" id="ing-perda" name="perdaPct" min="0" max="95" step="0.1" value="0">
-            <span class="ajuda">Descasque, cocção, aparas — o que se perde até usar o ingrediente</span>
-          </div>
-          <div class="campo" style="justify-content:flex-end">
-            <button type="submit" class="btn bloco" id="btn-salvar-ingrediente">Adicionar ingrediente</button>
-          </div>
-        </form>
-      </div>
-
-      <div class="cartao">
-        <h2>Ingredientes cadastrados <span id="contador-ingredientes" class="badge ok"></span></h2>
-        <div id="lista-ingredientes"></div>
-      </div>
-    </section>
-
-    <!-- ================= PRATOS (lista) ================= -->
-    <section class="vista" id="vista-pratos" role="tabpanel">
-      <div id="pratos-lista-wrap">
+      <!-- ================= INGREDIENTES ================= -->
+      <section class="vista" id="vista-ingredientes" role="tabpanel">
         <div class="cartao">
-          <h2>Novo prato</h2>
-          <form id="form-prato" class="grade-form duas-colunas" novalidate>
+          <h2>Novo ingrediente</h2>
+          <p class="subtitulo">Informe o preço e a quantidade da embalagem que você compra. O sistema calcula
+            o custo por grama/ml/unidade automaticamente — depois, ao montar o prato, você pode usar
+            esse ingrediente em qualquer unidade compatível (ex: comprou em kg, usa em gramas na receita).</p>
+          <form id="form-ingrediente" class="grade-form duas-colunas" novalidate>
             <div class="campo">
-              <label for="prato-nome">Nome do prato</label>
-              <input type="text" id="prato-nome" name="nome" required placeholder="Ex: Caranga na moringa">
-            </div>
-            <div class="campo">
-              <label for="prato-categoria">Categoria</label>
-              <input type="text" id="prato-categoria" name="categoria" placeholder="Ex: Caldos, Baldes, Bebidas">
-            </div>
-            <div class="campo">
-              <label for="prato-mix">Participação estimada nas vendas (%)</label>
-              <input type="number" id="prato-mix" name="mixVendasPct" min="0" max="100" step="0.1" value="0">
-              <span class="ajuda">Usado no cálculo do ponto de equilíbrio. Pode deixar 0 se não souber ainda.</span>
-            </div>
-            <div class="campo" style="justify-content:flex-end">
-              <button type="submit" class="btn bloco">Criar prato</button>
-            </div>
-          </form>
-        </div>
-
-        <div class="cartao">
-          <h2>Pratos cadastrados <span id="contador-pratos" class="badge ok"></span></h2>
-          <div id="lista-pratos" class="lista-cards"></div>
-        </div>
-      </div>
-
-      <!-- ================= FICHA TÉCNICA (detalhe) ================= -->
-      <div id="prato-detalhe-wrap" style="display:none">
-        <div class="cartao">
-          <div class="cabecalho-prato">
-            <button class="voltar-btn" id="btn-voltar-pratos">← Voltar aos pratos</button>
-          </div>
-          <h2 id="detalhe-prato-nome">Prato</h2>
-
-          <h3>Adicionar ingrediente à ficha técnica</h3>
-          <form id="form-item-prato" class="grade-form duas-colunas" novalidate>
-            <div class="campo">
-              <label for="item-ingrediente">Ingrediente</label>
-              <select id="item-ingrediente" name="ingredienteId" required></select>
+              <label for="ing-nome">Nome do ingrediente</label>
+              <input type="text" id="ing-nome" name="nome" required placeholder="Ex: Carne de caranguejo">
             </div>
             <div class="campo">
-              <label for="item-qtd">Quantidade usada na receita</label>
-              <div class="linha-qtd-unidade">
-                <input type="number" id="item-qtd" name="qtd" min="0" step="0.001" required>
-                <select id="item-unidade" name="unidade"></select>
-              </div>
-              <span class="ajuda" id="item-unidade-ajuda"></span>
-            </div>
-            <div class="campo" style="grid-column: 1 / -1">
-              <button type="submit" class="btn">Adicionar à receita</button>
-            </div>
-          </form>
-
-          <h3>Itens da receita</h3>
-          <div id="detalhe-itens"></div>
-
-          <div class="metricas" id="detalhe-metricas"></div>
-          <div id="detalhe-alerta"></div>
-
-          <h3>Preço final de venda</h3>
-          <div class="grade-form duas-colunas">
-            <div class="campo">
-              <label for="prato-preco-manual">Ajustar preço final (opcional)</label>
-              <input type="number" id="prato-preco-manual" min="0" step="0.01">
-              <span class="ajuda">Deixe igual ao sugerido se não quiser alterar</span>
-            </div>
-            <div class="campo" style="justify-content:flex-end">
-              <button type="button" class="btn bloco" id="btn-salvar-preco-prato">💾 Salvar preço</button>
-            </div>
-          </div>
-
-          <div class="acoes">
-            <button type="button" class="btn perigo" id="btn-excluir-prato">🗑️ Excluir prato</button>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= CONFIGURAÇÕES ================= -->
-    <section class="vista" id="vista-config" role="tabpanel">
-      <div class="cartao">
-        <h2>Parâmetros de precificação</h2>
-        <p class="subtitulo">Preço de venda = Custo direto ÷ (1 − (lucro% + taxa de cartão% + impostos% + outros%)).
-          É o método do divisor de markup, padrão no food service: garante que a margem seja sobre o
-          preço final, não sobre o custo.</p>
-        <form id="form-config" class="grade-form duas-colunas" novalidate>
-          <div class="campo">
-            <label for="cfg-lucro">Margem de lucro desejada (%)</label>
-            <input type="number" id="cfg-lucro" min="0" max="95" step="0.1">
-          </div>
-          <div class="campo">
-            <label for="cfg-cartao">Taxa de cartão / maquininha (%)</label>
-            <input type="number" id="cfg-cartao" min="0" max="30" step="0.1">
-          </div>
-          <div class="campo">
-            <label for="cfg-impostos">Impostos sobre a venda (%)</label>
-            <input type="number" id="cfg-impostos" min="0" max="40" step="0.1">
-            <span class="ajuda">Ex: Simples Nacional</span>
-          </div>
-          <div class="campo">
-            <label for="cfg-outros">Outros custos variáveis (%)</label>
-            <input type="number" id="cfg-outros" min="0" max="40" step="0.1">
-            <span class="ajuda">Ex: embalagem descartável, taxa de app de delivery</span>
-          </div>
-          <div class="campo" style="grid-column: 1 / -1">
-            <button type="submit" class="btn bloco">💾 Salvar configurações</button>
-          </div>
-        </form>
-        <div class="metricas">
-          <div class="metrica"><span>Soma dos percentuais</span><b id="cfg-soma">—</b></div>
-        </div>
-        <div id="cfg-alerta"></div>
-      </div>
-
-      <!-- Branding / Logo -->
-      <div class="cartao">
-        <h2>🏷️ Branding — Logo da empresa</h2>
-        <p class="subtitulo">Faça upload da logo da sua empresa para exibir no topo do app e nos relatórios em PDF.<br>
-          A imagem fica salva apenas neste navegador.</p>
-        <div class="branding-preview" id="branding-preview">
-          <img id="preview-logo" src="" alt="Preview da logo" style="display:none">
-          <span id="branding-placeholder" class="branding-placeholder">Nenhuma logo configurada</span>
-        </div>
-        <div class="acoes" style="margin-top:var(--espaco-3)">
-          <label class="btn secundario" for="upload-logo" style="cursor:pointer">📷 Escolher imagem</label>
-          <input type="file" id="upload-logo" accept="image/*" style="display:none">
-          <button type="button" class="btn perigo pequeno" id="btn-remover-logo" style="display:none">🗑️ Remover
-            logo</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= CUSTOS FIXOS / PONTO DE EQUILÍBRIO ================= -->
-    <section class="vista" id="vista-custosfixos" role="tabpanel">
-      <div class="cartao">
-        <h2>Custos fixos mensais</h2>
-        <form id="form-custo-fixo" class="grade-form duas-colunas" novalidate>
-          <div class="campo">
-            <label for="cf-descricao">Descrição</label>
-            <input type="text" id="cf-descricao" placeholder="Ex: Aluguel, energia, folha de pagamento" required>
-          </div>
-          <div class="campo">
-            <label for="cf-valor">Valor mensal (R$)</label>
-            <input type="number" id="cf-valor" min="0" step="0.01" required>
-          </div>
-          <div class="campo" style="grid-column: 1 / -1">
-            <button type="submit" class="btn bloco">Adicionar custo fixo</button>
-          </div>
-        </form>
-        <div id="lista-custos-fixos"></div>
-        <div class="metricas">
-          <div class="metrica"><span>Total de custos fixos</span><b id="total-custo-fixo">R$ 0,00</b></div>
-        </div>
-      </div>
-
-      <div class="cartao">
-        <h2>Ponto de equilíbrio</h2>
-        <div id="ponto-equilibrio-conteudo"></div>
-      </div>
-    </section>
-
-    <!-- ================= PAYBACK DESCONTADO ================= -->
-    <section class="vista" id="vista-payback" role="tabpanel">
-      <div class="cartao">
-        <h2>📈 Análise de Payback Descontado</h2>
-        <p class="subtitulo">Calcule em quanto tempo um investimento se paga, considerando o valor do dinheiro no tempo.
-          Informe o investimento inicial, a taxa de desconto e os fluxos de caixa projetados por período.</p>
-        <form id="form-payback" class="grade-form duas-colunas" novalidate>
-          <div class="campo">
-            <label for="pb-investimento">Investimento Inicial (R$)</label>
-            <input type="number" id="pb-investimento" min="0" step="0.01" placeholder="Ex: 100000" required>
-          </div>
-          <div class="campo">
-            <label for="pb-taxa">Taxa de Desconto (%)</label>
-            <div class="linha-qtd-unidade">
-              <input type="number" id="pb-taxa" min="0" max="100" step="0.1" placeholder="Ex: 12" required>
-              <select id="pb-taxa-base">
-                <option value="anual">% a.a.</option>
-                <option value="mensal">% a.m.</option>
+              <label for="ing-unidade-compra">Unidade de compra</label>
+              <select id="ing-unidade-compra" name="unidadeCompra">
+                <option value="kg">Quilograma (kg)</option>
+                <option value="g">Grama (g)</option>
+                <option value="l">Litro (L)</option>
+                <option value="ml">Mililitro (ml)</option>
+                <option value="un">Unidade (un)</option>
               </select>
             </div>
-            <span class="ajuda">Custo de capital ou taxa mínima de atratividade (TMA)</span>
+            <div class="campo">
+              <label for="ing-qtd-embalagem">Quantidade na embalagem</label>
+              <input type="number" id="ing-qtd-embalagem" name="qtdEmbalagem" min="0" step="0.001" value="1" required>
+            </div>
+            <div class="campo">
+              <label for="ing-custo-embalagem">Custo da embalagem (R$)</label>
+              <input type="number" id="ing-custo-embalagem" name="custoEmbalagem" min="0" step="0.01" value="0" required>
+            </div>
+            <div class="campo">
+              <label for="ing-perda">Perda / quebra (%)</label>
+              <input type="number" id="ing-perda" name="perdaPct" min="0" max="95" step="0.1" value="0">
+              <span class="ajuda">Descasque, cocção, aparas — o que se perde até usar o ingrediente</span>
+            </div>
+            <div class="campo" style="justify-content:flex-end">
+              <button type="submit" class="btn bloco" id="btn-salvar-ingrediente">Adicionar ingrediente</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="cartao">
+          <h2>Ingredientes cadastrados <span id="contador-ingredientes" class="badge ok"></span></h2>
+          <div id="lista-ingredientes"></div>
+        </div>
+      </section>
+
+      <!-- ================= PRATOS (lista) ================= -->
+      <section class="vista" id="vista-pratos" role="tabpanel">
+        <div id="pratos-lista-wrap">
+          <div class="cartao">
+            <h2>Novo prato</h2>
+            <form id="form-prato" class="grade-form duas-colunas" novalidate>
+              <div class="campo">
+                <label for="prato-nome">Nome do prato</label>
+                <input type="text" id="prato-nome" name="nome" required placeholder="Ex: Caranga na moringa">
+              </div>
+              <div class="campo">
+                <label for="prato-categoria">Categoria</label>
+                <input type="text" id="prato-categoria" name="categoria" placeholder="Ex: Caldos, Baldes, Bebidas">
+              </div>
+              <div class="campo">
+                <label for="prato-mix">Participação estimada nas vendas (%)</label>
+                <input type="number" id="prato-mix" name="mixVendasPct" min="0" max="100" step="0.1" value="0">
+                <span class="ajuda">Usado no cálculo do ponto de equilíbrio. Pode deixar 0 se não souber ainda.</span>
+              </div>
+              <div class="campo" style="justify-content:flex-end">
+                <button type="submit" class="btn bloco">Criar prato</button>
+              </div>
+            </form>
           </div>
-        </form>
 
-        <h3>Fluxos de Caixa por Período</h3>
-        <p class="subtitulo">Adicione os fluxos de caixa projetados. Cada linha representa um período.</p>
-        <div id="payback-fluxos">
-          <!-- linhas dinâmicas de fluxo de caixa -->
-        </div>
-        <div class="acoes" style="margin-top:var(--espaco-2)">
-          <button type="button" class="btn secundario pequeno" id="btn-add-fluxo">＋ Adicionar período</button>
-          <button type="button" class="btn secundario pequeno" id="btn-preencher-rapido">⚡ Preencher rápido</button>
-        </div>
-
-        <div style="margin-top:var(--espaco-4)">
-          <button type="button" class="btn bloco" id="btn-calcular-payback">📊 Calcular Payback Descontado</button>
-        </div>
-      </div>
-
-      <!-- Resultados -->
-      <div class="cartao" id="payback-resultado-wrap" style="display:none">
-        <h2>Resultado</h2>
-
-        <!-- KPI Card -->
-        <div id="payback-kpi"></div>
-
-        <!-- Alerta -->
-        <div id="payback-alerta"></div>
-
-        <!-- Tabela detalhada -->
-        <div id="payback-tabela"></div>
-
-        <!-- Mini gráfico -->
-        <div class="grafico-wrap" id="grafico-wrap" style="display:none">
-          <h3>Curva do Fluxo Descontado Acumulado</h3>
-          <canvas id="grafico-payback" width="700" height="280"></canvas>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= RELATÓRIOS ================= -->
-    <section class="vista" id="vista-relatorios" role="tabpanel">
-      <div class="cartao">
-        <h2>Relatórios</h2>
-        <p class="subtitulo">O relatório em PDF é gerado pela própria função de impressão do navegador —
-          funciona no computador e no celular, sem instalar nada. Ao abrir a janela de impressão,
-          escolha "Salvar como PDF" no destino.</p>
-        <div class="acoes">
-          <button type="button" class="btn" id="btn-gerar-pdf">🖨️ Gerar relatório (PDF/imprimir)</button>
-          <button type="button" class="btn secundario" id="btn-exportar-planilha">⬇️ Baixar planilha (.xls)</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ================= IMPORTAR / EXPORTAR ================= -->
-    <section class="vista" id="vista-importar" role="tabpanel">
-      <div class="cartao">
-        <h2>Atualizar ingredientes em massa (CSV)</h2>
-        <p class="subtitulo">Colunas esperadas na primeira linha: nome, unidadeCompra, qtdEmbalagem, custoEmbalagem,
-          perdaPct
-          — unidadeCompra deve ser kg, g, l, ml ou un.</p>
-        <div class="acoes">
-          <button type="button" class="btn secundario" id="btn-baixar-modelo">⬇️ Baixar modelo CSV</button>
-        </div>
-        <form id="form-importar" class="grade-form" style="margin-top:1rem">
-          <div class="campo">
-            <label for="arquivo-csv">Selecione o arquivo .csv</label>
-            <input type="file" id="arquivo-csv" accept=".csv">
+          <div class="cartao">
+            <h2>Pratos cadastrados <span id="contador-pratos" class="badge ok"></span></h2>
+            <div id="lista-pratos" class="lista-cards"></div>
           </div>
-          <div class="campo">
-            <button type="submit" class="btn bloco">Importar</button>
-          </div>
-        </form>
-        <div id="importar-resultado"></div>
-      </div>
-
-      <div class="cartao">
-        <h2>Backup completo dos dados</h2>
-        <p class="subtitulo">Os dados ficam salvos neste navegador. Para levar para outro computador/celular
-          ou fazer backup de segurança, exporte e importe o arquivo abaixo.</p>
-        <div class="acoes">
-          <button type="button" class="btn secundario" id="btn-exportar-backup">⬇️ Exportar backup (.json)</button>
         </div>
-        <form id="form-importar-backup" class="grade-form" style="margin-top:1rem">
-          <div class="campo">
-            <label for="arquivo-backup">Restaurar backup (.json)</label>
-            <input type="file" id="arquivo-backup" accept=".json">
-          </div>
-          <div class="campo">
-            <button type="submit" class="btn bloco secundario">Restaurar (substitui os dados atuais)</button>
-          </div>
-        </form>
-      </div>
-    </section>
 
-  </main>
+        <!-- ================= FICHA TÉCNICA (detalhe) ================= -->
+        <div id="prato-detalhe-wrap" style="display:none">
+          <div class="cartao">
+            <div class="cabecalho-prato">
+              <button class="voltar-btn" id="btn-voltar-pratos">← Voltar aos pratos</button>
+            </div>
+            <h2 id="detalhe-prato-nome">Prato</h2>
+
+            <h3>Adicionar ingrediente à ficha técnica</h3>
+            <form id="form-item-prato" class="grade-form duas-colunas" novalidate>
+              <div class="campo">
+                <label for="item-ingrediente">Ingrediente</label>
+                <select id="item-ingrediente" name="ingredienteId" required></select>
+              </div>
+              <div class="campo">
+                <label for="item-qtd">Quantidade usada na receita</label>
+                <div class="linha-qtd-unidade">
+                  <input type="number" id="item-qtd" name="qtd" min="0" step="0.001" required>
+                  <select id="item-unidade" name="unidade"></select>
+                </div>
+                <span class="ajuda" id="item-unidade-ajuda"></span>
+              </div>
+              <div class="campo" style="grid-column: 1 / -1">
+                <button type="submit" class="btn">Adicionar à receita</button>
+              </div>
+            </form>
+
+            <h3>Itens da receita</h3>
+            <div id="detalhe-itens"></div>
+
+            <div class="metricas" id="detalhe-metricas"></div>
+            <div id="detalhe-alerta"></div>
+
+            <h3>Preço final de venda</h3>
+            <div class="grade-form duas-colunas">
+              <div class="campo">
+                <label for="prato-preco-manual">Ajustar preço final (opcional)</label>
+                <input type="number" id="prato-preco-manual" min="0" step="0.01">
+                <span class="ajuda">Deixe igual ao sugerido se não quiser alterar</span>
+              </div>
+              <div class="campo" style="justify-content:flex-end">
+                <button type="button" class="btn bloco" id="btn-salvar-preco-prato">💾 Salvar preço</button>
+              </div>
+            </div>
+
+            <div class="acoes">
+              <button type="button" class="btn perigo" id="btn-excluir-prato">🗑️ Excluir prato</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= FATURAMENTO ================= -->
+      <section class="vista" id="vista-faturamento" role="tabpanel">
+
+        <!-- Formulário de lançamento -->
+        <div class="cartao">
+          <h2>💰 Registrar Faturamento</h2>
+          <p class="subtitulo">Registre diariamente as vendas de cada prato. O sistema calcula o total automaticamente com base no preço cadastrado.</p>
+          <form id="form-fat" class="grade-form fat-form-grid" novalidate>
+            <div class="campo">
+              <label for="fat-data">Data</label>
+              <input type="date" id="fat-data" name="data" required>
+            </div>
+            <div class="campo">
+              <label for="fat-prato">Prato</label>
+              <select id="fat-prato" name="pratoId" required></select>
+            </div>
+            <div class="campo">
+              <label for="fat-qtd">Quantidade vendida</label>
+              <input type="number" id="fat-qtd" name="qtd" min="1" step="1" value="1" required>
+            </div>
+            <div class="campo">
+              <label for="fat-preco">Preço unitário (R$)</label>
+              <input type="number" id="fat-preco" name="precoUnitario" min="0" step="0.01" required>
+              <span class="ajuda">Preenchido automaticamente pelo preço do prato — editável</span>
+            </div>
+            <div class="campo fat-btn-col">
+              <button type="submit" class="btn bloco">＋ Registrar venda</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Filtros -->
+        <div class="cartao fat-filtros-card">
+          <h2>📊 Dashboard de Faturamento</h2>
+          <div class="fat-filtros">
+            <div class="campo">
+              <label for="fat-fil-ini">De</label>
+              <input type="date" id="fat-fil-ini" name="filIni">
+            </div>
+            <div class="campo">
+              <label for="fat-fil-fim">Até</label>
+              <input type="date" id="fat-fil-fim" name="filFim">
+            </div>
+            <div class="campo">
+              <label for="fat-fil-prato">Prato</label>
+              <select id="fat-fil-prato">
+                <option value="">Todos os pratos</option>
+              </select>
+            </div>
+            <div class="campo fat-filtros-btn">
+              <button type="button" class="btn secundario" id="btn-fat-filtrar">🔍 Filtrar</button>
+              <button type="button" class="btn secundario" id="btn-fat-limpar">✕ Limpar</button>
+            </div>
+          </div>
+
+          <!-- KPI Cards -->
+          <div class="fat-kpis" id="fat-kpis"></div>
+
+          <!-- Gráfico -->
+          <div class="grafico-wrap fat-grafico-wrap" id="fat-grafico-wrap" style="display:none">
+            <h3>Faturamento por Dia</h3>
+            <canvas id="grafico-faturamento" width="700" height="260"></canvas>
+          </div>
+        </div>
+
+        <!-- Tabela de lançamentos -->
+        <div class="cartao">
+          <div class="fat-tabela-header">
+            <h2>Lançamentos</h2>
+            <div class="acoes fat-export-acoes" id="fat-export-acoes">
+              <button type="button" class="btn secundario pequeno" id="btn-fat-pdf">🖨️ PDF</button>
+              <button type="button" class="btn secundario pequeno" id="btn-fat-excel">📥 Excel</button>
+            </div>
+          </div>
+          <div id="fat-lista"></div>
+        </div>
+
+        <!-- Área de impressão faturamento -->
+        <div id="fat-imprimivel" style="display:none"></div>
+      </section>
+
+      <!-- ================= CONFIGURAÇÕES ================= -->
+      <section class="vista" id="vista-config" role="tabpanel">
+        <div class="cartao">
+          <h2>Parâmetros de precificação</h2>
+          <p class="subtitulo">Preço de venda = Custo direto ÷ (1 − (lucro% + taxa de cartão% + impostos% + outros%)).
+            É o método do divisor de markup, padrão no food service: garante que a margem seja sobre o
+            preço final, não sobre o custo.</p>
+          <form id="form-config" class="grade-form duas-colunas" novalidate>
+            <div class="campo">
+              <label for="cfg-lucro">Margem de lucro desejada (%)</label>
+              <input type="number" id="cfg-lucro" min="0" max="95" step="0.1">
+            </div>
+            <div class="campo">
+              <label for="cfg-cartao">Taxa de cartão / maquininha (%)</label>
+              <input type="number" id="cfg-cartao" min="0" max="30" step="0.1">
+            </div>
+            <div class="campo">
+              <label for="cfg-impostos">Impostos sobre a venda (%)</label>
+              <input type="number" id="cfg-impostos" min="0" max="40" step="0.1">
+              <span class="ajuda">Ex: Simples Nacional</span>
+            </div>
+            <div class="campo">
+              <label for="cfg-outros">Outros custos variáveis (%)</label>
+              <input type="number" id="cfg-outros" min="0" max="40" step="0.1">
+              <span class="ajuda">Ex: embalagem descartável, taxa de app de delivery</span>
+            </div>
+            <div class="campo" style="grid-column: 1 / -1">
+              <button type="submit" class="btn bloco">💾 Salvar configurações</button>
+            </div>
+          </form>
+          <div class="metricas">
+            <div class="metrica"><span>Soma dos percentuais</span><b id="cfg-soma">—</b></div>
+          </div>
+          <div id="cfg-alerta"></div>
+        </div>
+
+        <!-- Branding / Logo -->
+        <div class="cartao">
+          <h2>🏷️ Branding — Logo da empresa</h2>
+          <p class="subtitulo">Faça upload da logo da sua empresa para exibir no topo do app e nos relatórios em PDF.<br>
+            A imagem fica salva apenas neste navegador.</p>
+          <div class="branding-preview" id="branding-preview">
+            <img id="preview-logo" src="" alt="Preview da logo" style="display:none">
+            <span id="branding-placeholder" class="branding-placeholder">Nenhuma logo configurada</span>
+          </div>
+          <div class="acoes" style="margin-top:var(--espaco-3)">
+            <label class="btn secundario" for="upload-logo" style="cursor:pointer">📷 Escolher imagem</label>
+            <input type="file" id="upload-logo" accept="image/*" style="display:none">
+            <button type="button" class="btn perigo pequeno" id="btn-remover-logo" style="display:none">🗑️ Remover
+              logo</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= CUSTOS FIXOS / PONTO DE EQUILÍBRIO ================= -->
+      <section class="vista" id="vista-custosfixos" role="tabpanel">
+        <div class="cartao">
+          <h2>Custos fixos mensais</h2>
+          <form id="form-custo-fixo" class="grade-form duas-colunas" novalidate>
+            <div class="campo">
+              <label for="cf-descricao">Descrição</label>
+              <input type="text" id="cf-descricao" placeholder="Ex: Aluguel, energia, folha de pagamento" required>
+            </div>
+            <div class="campo">
+              <label for="cf-valor">Valor mensal (R$)</label>
+              <input type="number" id="cf-valor" min="0" step="0.01" required>
+            </div>
+            <div class="campo" style="grid-column: 1 / -1">
+              <button type="submit" class="btn bloco">Adicionar custo fixo</button>
+            </div>
+          </form>
+          <div id="lista-custos-fixos"></div>
+          <div class="metricas">
+            <div class="metrica"><span>Total de custos fixos</span><b id="total-custo-fixo">R$ 0,00</b></div>
+          </div>
+        </div>
+
+        <div class="cartao">
+          <h2>Ponto de equilíbrio</h2>
+          <div id="ponto-equilibrio-conteudo"></div>
+        </div>
+      </section>
+
+      <!-- ================= PAYBACK DESCONTADO ================= -->
+      <section class="vista" id="vista-payback" role="tabpanel">
+        <div class="cartao">
+          <h2>📈 Análise de Payback Descontado</h2>
+          <p class="subtitulo">Calcule em quanto tempo um investimento se paga, considerando o valor do dinheiro no tempo.
+            Informe o investimento inicial, a taxa de desconto e os fluxos de caixa projetados por período.</p>
+          <form id="form-payback" class="grade-form duas-colunas" novalidate>
+            <div class="campo">
+              <label for="pb-investimento">Investimento Inicial (R$)</label>
+              <input type="number" id="pb-investimento" min="0" step="0.01" placeholder="Ex: 100000" required>
+            </div>
+            <div class="campo">
+              <label for="pb-taxa">Taxa de Desconto (%)</label>
+              <div class="linha-qtd-unidade">
+                <input type="number" id="pb-taxa" min="0" max="100" step="0.1" placeholder="Ex: 12" required>
+                <select id="pb-taxa-base">
+                  <option value="anual">% a.a.</option>
+                  <option value="mensal">% a.m.</option>
+                </select>
+              </div>
+              <span class="ajuda">Custo de capital ou taxa mínima de atratividade (TMA)</span>
+            </div>
+          </form>
+
+          <h3>Fluxos de Caixa por Período</h3>
+          <p class="subtitulo">Adicione os fluxos de caixa projetados. Cada linha representa um período.</p>
+          <div id="payback-fluxos">
+            <!-- linhas dinâmicas de fluxo de caixa -->
+          </div>
+          <div class="acoes" style="margin-top:var(--espaco-2)">
+            <button type="button" class="btn secundario pequeno" id="btn-add-fluxo">＋ Adicionar período</button>
+            <button type="button" class="btn secundario pequeno" id="btn-preencher-rapido">⚡ Preencher rápido</button>
+          </div>
+
+          <div style="margin-top:var(--espaco-4)">
+            <button type="button" class="btn bloco" id="btn-calcular-payback">📊 Calcular Payback Descontado</button>
+          </div>
+        </div>
+
+        <!-- Resultados -->
+        <div class="cartao" id="payback-resultado-wrap" style="display:none">
+          <h2>Resultado</h2>
+          <div id="payback-kpi"></div>
+          <div id="payback-alerta"></div>
+          <div id="payback-tabela"></div>
+          <div class="grafico-wrap" id="grafico-wrap" style="display:none">
+            <h3>Curva do Fluxo Descontado Acumulado</h3>
+            <canvas id="grafico-payback" width="700" height="280"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= RELATÓRIOS ================= -->
+      <section class="vista" id="vista-relatorios" role="tabpanel">
+        <div class="cartao">
+          <h2>Relatórios</h2>
+          <p class="subtitulo">O relatório em PDF é gerado pela própria função de impressão do navegador —
+            funciona no computador e no celular, sem instalar nada. Ao abrir a janela de impressão,
+            escolha "Salvar como PDF" no destino.</p>
+          <div class="acoes">
+            <button type="button" class="btn" id="btn-gerar-pdf">🖨️ Gerar relatório (PDF/imprimir)</button>
+            <button type="button" class="btn secundario" id="btn-exportar-planilha">⬇️ Baixar planilha (.xls)</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= IMPORTAR / EXPORTAR ================= -->
+      <section class="vista" id="vista-importar" role="tabpanel">
+        <div class="cartao">
+          <h2>Atualizar ingredientes em massa (CSV)</h2>
+          <p class="subtitulo">Colunas esperadas na primeira linha: nome, unidadeCompra, qtdEmbalagem, custoEmbalagem,
+            perdaPct
+            — unidadeCompra deve ser kg, g, l, ml ou un.</p>
+          <div class="acoes">
+            <button type="button" class="btn secundario" id="btn-baixar-modelo">⬇️ Baixar modelo CSV</button>
+          </div>
+          <form id="form-importar" class="grade-form" style="margin-top:1rem">
+            <div class="campo">
+              <label for="arquivo-csv">Selecione o arquivo .csv</label>
+              <input type="file" id="arquivo-csv" accept=".csv">
+            </div>
+            <div class="campo">
+              <button type="submit" class="btn bloco">Importar</button>
+            </div>
+          </form>
+          <div id="importar-resultado"></div>
+        </div>
+
+        <div class="cartao">
+          <h2>Backup completo dos dados</h2>
+          <p class="subtitulo">Os dados ficam salvos neste navegador. Para levar para outro computador/celular
+            ou fazer backup de segurança, exporte e importe o arquivo abaixo.</p>
+          <div class="acoes">
+            <button type="button" class="btn secundario" id="btn-exportar-backup">⬇️ Exportar backup (.json)</button>
+          </div>
+          <form id="form-importar-backup" class="grade-form" style="margin-top:1rem">
+            <div class="campo">
+              <label for="arquivo-backup">Restaurar backup (.json)</label>
+              <input type="file" id="arquivo-backup" accept=".json">
+            </div>
+            <div class="campo">
+              <button type="submit" class="btn bloco secundario">Restaurar (substitui os dados atuais)</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+    </main>
+  </div>
 
   <!-- Área usada só na hora de imprimir/gerar PDF -->
   <div id="relatorio-imprimivel"></div>

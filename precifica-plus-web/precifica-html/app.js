@@ -81,6 +81,7 @@
       pratos: [],
       config: { lucroPct: 20, taxaCartaoPct: 4, impostosPct: 6, outrosPct: 0 },
       custosFixos: [],
+      faturamento: [],
     };
   }
 
@@ -95,6 +96,7 @@
         pratos: Array.isArray(dados.pratos) ? dados.pratos : [],
         config: Object.assign(base.config, dados.config || {}),
         custosFixos: Array.isArray(dados.custosFixos) ? dados.custosFixos : [],
+        faturamento: Array.isArray(dados.faturamento) ? dados.faturamento : [],
       };
     } catch (e) {
       console.error("Não foi possível ler os dados salvos, iniciando do zero.", e);
@@ -211,20 +213,28 @@
   // Navegação entre abas
   // ------------------------------------------------------------------- //
 
+  function fecharSidebarMobile() {
+    document.getElementById("sidebar").classList.remove("aberta");
+    document.getElementById("sidebar-overlay").classList.remove("ativo");
+    document.getElementById("btn-menu").setAttribute("aria-expanded", "false");
+  }
+
   function irPara(vista) {
     vistaAtual = vista;
     document.querySelectorAll(".vista").forEach(function (v) { v.classList.remove("ativa"); });
     document.getElementById("vista-" + vista).classList.add("ativa");
-    document.querySelectorAll(".aba-btn").forEach(function (b) {
+    document.querySelectorAll(".sidebar-item").forEach(function (b) {
       var ativa = b.getAttribute("data-vista") === vista;
       b.classList.toggle("ativa", ativa);
       b.setAttribute("aria-selected", ativa ? "true" : "false");
     });
+    fecharSidebarMobile();
     if (vista === "ingredientes") renderIngredientes();
     if (vista === "pratos") { mostrarListaPratos(); renderPratosLista(); }
     if (vista === "config") { renderConfig(); carregarLogo(); }
     if (vista === "custosfixos") renderCustosFixos();
     if (vista === "payback") renderPaybackUI();
+    if (vista === "faturamento") renderFaturamento();
   }
 
   // ------------------------------------------------------------------- //
@@ -836,11 +846,11 @@
     var range = maxV - minV;
 
     var isDark = document.documentElement.classList.contains("dark");
-    var bgColor = isDark ? "#1e293b" : "#ffffff";
-    var gridColor = isDark ? "#334155" : "#e8dcc0";
-    var textColor = isDark ? "#94a3b8" : "#6b5a4a";
-    var lineColor = isDark ? "#e5383b" : "#c41e24";
-    var zeroColor = isDark ? "#ffd54f" : "#f2b705";
+    var bgColor = isDark ? "#1F1833" : "#ffffff";
+    var gridColor = isDark ? "#2F2848" : "#E2E0EB";
+    var textColor = isDark ? "#A09CB0" : "#5B5470";
+    var lineColor = "#FF7A00";
+    var zeroColor = "#FFD60A";
 
     ctx.clearRect(0, 0, W, H);
     ctx.fillStyle = bgColor;
@@ -879,7 +889,7 @@
     for (var j = 0; j < n; j++) {
       var px = pad.left + (chartW * j / (n - 1));
       var py = pad.top + chartH * ((maxV - vals[j]) / range);
-      ctx.fillStyle = vals[j] >= 0 ? (isDark ? "#66bb6a" : "#2e7d32") : lineColor;
+      ctx.fillStyle = vals[j] >= 0 ? (isDark ? "#4ADE80" : "#16A34A") : "#FF7A00";
       ctx.beginPath(); ctx.arc(px, py, 5, 0, Math.PI * 2); ctx.fill();
       ctx.fillStyle = textColor; ctx.font = "10px sans-serif"; ctx.textAlign = "center";
       ctx.fillText("P" + tabela[j].periodo, px, pad.top + chartH + 20);
@@ -1096,9 +1106,351 @@
     if (e.target && e.target.classList) e.target.classList.remove("campo-invalido");
   });
 
-  document.querySelectorAll(".aba-btn").forEach(function (b) {
+  document.querySelectorAll(".sidebar-item").forEach(function (b) {
     b.addEventListener("click", function () { irPara(b.getAttribute("data-vista")); });
   });
+
+  // ─── Sidebar mobile toggle ────────────────────────
+  var btnMenu = document.getElementById("btn-menu");
+  var sidebar = document.getElementById("sidebar");
+  var overlay = document.getElementById("sidebar-overlay");
+
+  btnMenu.addEventListener("click", function () {
+    var aberta = sidebar.classList.toggle("aberta");
+    overlay.classList.toggle("ativo", aberta);
+    btnMenu.setAttribute("aria-expanded", aberta ? "true" : "false");
+  });
+
+  overlay.addEventListener("click", fecharSidebarMobile);
+
+  // Botão tema mobile
+  var btnTemaMobile = document.getElementById("btn-tema-mobile");
+  if (btnTemaMobile) {
+    btnTemaMobile.addEventListener("click", function () {
+      alternarTema();
+      var isDark = document.documentElement.classList.contains("dark");
+      btnTemaMobile.querySelector(".tema-icone").textContent = isDark ? "🌙" : "☀️";
+    });
+  }
+
+  // ─── Sincronizar ícone tema mobile com sidebar ────
+  var _origAtualizarIcone = atualizarIconeTema;
+  atualizarIconeTema = function () {
+    _origAtualizarIcone();
+    var isDark = document.documentElement.classList.contains("dark");
+    var mobileIcone = document.getElementById("tema-icone-mobile");
+    if (mobileIcone) mobileIcone.textContent = isDark ? "🌙" : "☀️";
+  };
+
+  // ═══════════════════════════════════════════════════
+  // FATURAMENTO
+  // ═══════════════════════════════════════════════════
+
+  // Preenche o select de pratos do formulário de faturamento e filtros
+  function popularSelectsFaturamento() {
+    var selPrato = document.getElementById("fat-prato");
+    var selFil = document.getElementById("fat-fil-prato");
+    var ordenados = state.pratos.slice().sort(function (a, b) { return a.nome.localeCompare(b.nome, "pt-BR"); });
+
+    if (!ordenados.length) {
+      selPrato.innerHTML = '<option value="">Cadastre pratos primeiro</option>';
+    } else {
+      selPrato.innerHTML = ordenados.map(function (p) {
+        return '<option value="' + p.id + '">' + escapeHtml(p.nome) + '</option>';
+      }).join("");
+    }
+
+    selFil.innerHTML = '<option value="">Todos os pratos</option>' +
+      ordenados.map(function (p) {
+        return '<option value="' + p.id + '">' + escapeHtml(p.nome) + '</option>';
+      }).join("");
+
+    // Preenche preço ao mudar prato
+    atualizarPrecoPratoPadrao();
+  }
+
+  function atualizarPrecoPratoPadrao() {
+    var selPrato = document.getElementById("fat-prato");
+    var inputPreco = document.getElementById("fat-preco");
+    var pratoId = selPrato.value;
+    var prato = state.pratos.find(function (p) { return p.id === pratoId; });
+    if (prato) {
+      var r = calcularResumoPrato(prato);
+      inputPreco.value = r.precoFinal ? r.precoFinal.toFixed(2) : "";
+    } else {
+      inputPreco.value = "";
+    }
+  }
+
+  document.getElementById("fat-prato").addEventListener("change", atualizarPrecoPratoPadrao);
+
+  // Formulário de lançamento
+  document.getElementById("form-fat").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var dataEl = document.getElementById("fat-data");
+    var pratoEl = document.getElementById("fat-prato");
+    var qtdEl = document.getElementById("fat-qtd");
+    var precoEl = document.getElementById("fat-preco");
+
+    var data = dataEl.value;
+    var pratoId = pratoEl.value;
+    var qtd = parseInt(qtdEl.value) || 0;
+    var precoUnitario = parseFloat(precoEl.value);
+
+    var valido = true;
+    if (!data) { dataEl.classList.add("campo-invalido"); valido = false; }
+    if (!pratoId) { pratoEl.classList.add("campo-invalido"); valido = false; }
+    if (qtd <= 0) { qtdEl.classList.add("campo-invalido"); valido = false; }
+    if (isNaN(precoUnitario) || precoUnitario < 0) { precoEl.classList.add("campo-invalido"); valido = false; }
+    if (!valido) { mostrarToast("Preencha todos os campos corretamente.", "erro"); return; }
+
+    var prato = state.pratos.find(function (p) { return p.id === pratoId; });
+    var pratoNome = prato ? prato.nome : "Desconhecido";
+    var total = qtd * precoUnitario;
+
+    state.faturamento.push({
+      id: gerarId(),
+      data: data,
+      pratoId: pratoId,
+      pratoNome: pratoNome,
+      qtd: qtd,
+      precoUnitario: precoUnitario,
+      total: total,
+    });
+
+    salvarEstado();
+    mostrarToast('Venda de "' + pratoNome + '" registrada — ' + Calc.formatarMoeda(total));
+    document.getElementById("form-fat").reset();
+    // Repor data de hoje
+    document.getElementById("fat-data").value = new Date().toISOString().slice(0, 10);
+    popularSelectsFaturamento();
+    renderFaturamento();
+  });
+
+  // Filtro
+  function getLancamentosFiltrados() {
+    var ini = document.getElementById("fat-fil-ini").value;
+    var fim = document.getElementById("fat-fil-fim").value;
+    var pratoId = document.getElementById("fat-fil-prato").value;
+    return state.faturamento.filter(function (l) {
+      if (ini && l.data < ini) return false;
+      if (fim && l.data > fim) return false;
+      if (pratoId && l.pratoId !== pratoId) return false;
+      return true;
+    });
+  }
+
+  document.getElementById("btn-fat-filtrar").addEventListener("click", renderFaturamento);
+  document.getElementById("btn-fat-limpar").addEventListener("click", function () {
+    document.getElementById("fat-fil-ini").value = "";
+    document.getElementById("fat-fil-fim").value = "";
+    document.getElementById("fat-fil-prato").value = "";
+    renderFaturamento();
+  });
+
+  // Render principal do faturamento
+  function renderFaturamento() {
+    popularSelectsFaturamento();
+    var lista = getLancamentosFiltrados();
+    var kpisDiv = document.getElementById("fat-kpis");
+    var fatLista = document.getElementById("fat-lista");
+
+    // KPIs
+    var totalFat = lista.reduce(function (s, l) { return s + l.total; }, 0);
+    var totalQtd = lista.reduce(function (s, l) { return s + l.qtd; }, 0);
+    var ticketMedio = lista.length ? totalFat / lista.length : 0;
+
+    // Prato campeão
+    var porPrato = {};
+    lista.forEach(function (l) {
+      porPrato[l.pratoNome] = (porPrato[l.pratoNome] || 0) + l.total;
+    });
+    var campeao = "-";
+    var maxFat = 0;
+    Object.keys(porPrato).forEach(function (nome) {
+      if (porPrato[nome] > maxFat) { maxFat = porPrato[nome]; campeao = nome; }
+    });
+
+    kpisDiv.innerHTML =
+      kpiCard("laranja", "💰", "Faturamento Total", Calc.formatarMoeda(totalFat)) +
+      kpiCard("ouro", "🧾", "Ticket Médio", Calc.formatarMoeda(ticketMedio)) +
+      kpiCard("verde", "📦", "Itens Vendidos", totalQtd) +
+      kpiCard("roxo", "🏆", "Prato Campeão", campeao.length > 14 ? campeao.slice(0, 13) + "…" : campeao);
+
+    // Gráfico
+    desenharGraficoFaturamento(lista);
+
+    // Tabela
+    if (!lista.length) {
+      fatLista.innerHTML = '<div class="vazio"><span class="emoji">💰</span>Nenhum lançamento no período selecionado.</div>';
+      return;
+    }
+
+    var ordenados = lista.slice().sort(function (a, b) { return b.data.localeCompare(a.data); });
+    var html = '<div class="tabela-wrap"><table><thead><tr><th>Data</th><th>Prato</th><th>Qtd</th><th>Preço Unit.</th><th>Total</th><th></th></tr></thead><tbody>';
+    ordenados.forEach(function (l) {
+      var dataFmt = l.data ? l.data.split("-").reverse().join("/") : "-";
+      html += '<tr>' +
+        '<td>' + dataFmt + '</td>' +
+        '<td>' + escapeHtml(l.pratoNome) + '</td>' +
+        '<td class="numerico">' + l.qtd + '</td>' +
+        '<td class="numerico">' + Calc.formatarMoeda(l.precoUnitario) + '</td>' +
+        '<td class="numerico"><b>' + Calc.formatarMoeda(l.total) + '</b></td>' +
+        '<td class="acoes-col"><button type="button" class="btn perigo pequeno" data-excluir-fat="' + l.id + '" aria-label="Excluir lançamento">🗑️</button></td>' +
+        '</tr>';
+    });
+    html += '</tbody></table></div>';
+    fatLista.innerHTML = html;
+  }
+
+  function kpiCard(cor, icone, label, valor) {
+    return '<div class="fat-kpi-card ' + cor + '">' +
+      '<div class="fat-kpi-icon">' + icone + '</div>' +
+      '<div class="fat-kpi-label">' + label + '</div>' +
+      '<div class="fat-kpi-valor">' + valor + '</div>' +
+      '</div>';
+  }
+
+  // Excluir lançamento
+  document.getElementById("fat-lista").addEventListener("click", function (e) {
+    var btn = e.target.closest("[data-excluir-fat]");
+    if (!btn) return;
+    var id = btn.getAttribute("data-excluir-fat");
+    abrirModal("Excluir lançamento", "Remover este lançamento de faturamento?", function () {
+      state.faturamento = state.faturamento.filter(function (l) { return l.id !== id; });
+      salvarEstado();
+      renderFaturamento();
+      mostrarToast("Lançamento removido.");
+    });
+  });
+
+  // Gráfico de barras — faturamento por dia
+  function desenharGraficoFaturamento(lista) {
+    var wrap = document.getElementById("fat-grafico-wrap");
+    var canvas = document.getElementById("grafico-faturamento");
+    if (!lista.length) { wrap.style.display = "none"; return; }
+    wrap.style.display = "";
+
+    // Agrupa por data
+    var porDia = {};
+    lista.forEach(function (l) { porDia[l.data] = (porDia[l.data] || 0) + l.total; });
+    var dias = Object.keys(porDia).sort();
+    if (dias.length < 1) { wrap.style.display = "none"; return; }
+
+    var vals = dias.map(function (d) { return porDia[d]; });
+    var maxV = Math.max.apply(null, vals) * 1.15 || 1;
+
+    var isDark = document.documentElement.classList.contains("dark");
+    var bgColor = isDark ? "#1F1833" : "#ffffff";
+    var gridColor = isDark ? "#2F2848" : "#E2E0EB";
+    var textColor = isDark ? "#A09CB0" : "#5B5470";
+    var barColor = "#FF7A00";
+    var barHover = "#FFD60A";
+
+    var W = canvas.width, H = canvas.height;
+    var pad = { top: 24, right: 20, bottom: 52, left: 80 };
+    var chartW = W - pad.left - pad.right;
+    var chartH = H - pad.top - pad.bottom;
+    var n = dias.length;
+    var barW = Math.max(4, Math.floor(chartW / n) - 6);
+    var ctx = canvas.getContext("2d");
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = bgColor;
+    ctx.fillRect(0, 0, W, H);
+
+    // Grid horizontal
+    var gridSteps = 4;
+    for (var g = 0; g <= gridSteps; g++) {
+      var gy = pad.top + (chartH * g / gridSteps);
+      ctx.strokeStyle = gridColor; ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(pad.left, gy); ctx.lineTo(W - pad.right, gy); ctx.stroke();
+      var gval = maxV * (1 - g / gridSteps);
+      ctx.fillStyle = textColor; ctx.font = "11px sans-serif"; ctx.textAlign = "right";
+      ctx.fillText(Calc.formatarMoeda(gval), pad.left - 6, gy + 4);
+    }
+
+    // Barras
+    for (var i = 0; i < n; i++) {
+      var x = pad.left + (chartW * i / n) + (chartW / n - barW) / 2;
+      var barH2 = chartH * (vals[i] / maxV);
+      var y = pad.top + chartH - barH2;
+      var grad = ctx.createLinearGradient(0, y, 0, y + barH2);
+      grad.addColorStop(0, barColor);
+      grad.addColorStop(1, barHover);
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x, y, barW, barH2, [4, 4, 0, 0]) : ctx.rect(x, y, barW, barH2);
+      ctx.fill();
+
+      // Label data (dd/mm) — only show every nth
+      var step = Math.ceil(n / 12);
+      if (i % step === 0) {
+        var parts = dias[i].split("-");
+        var label = parts[2] + "/" + parts[1];
+        ctx.fillStyle = textColor; ctx.font = "10px sans-serif"; ctx.textAlign = "center";
+        ctx.fillText(label, x + barW / 2, pad.top + chartH + 16);
+      }
+    }
+  }
+
+  // ─── Exportar PDF faturamento ─────────────────────
+  document.getElementById("btn-fat-pdf").addEventListener("click", function () {
+    var lista = getLancamentosFiltrados();
+    var totalFat = lista.reduce(function (s, l) { return s + l.total; }, 0);
+    var ordenados = lista.slice().sort(function (a, b) { return b.data.localeCompare(a.data); });
+    var linhas = ordenados.map(function (l) {
+      var dataFmt = l.data ? l.data.split("-").reverse().join("/") : "-";
+      return "<tr><td>" + dataFmt + "</td><td>" + escapeHtml(l.pratoNome) + "</td><td style='text-align:right'>" +
+        l.qtd + "</td><td style='text-align:right'>" + Calc.formatarMoeda(l.precoUnitario) +
+        "</td><td style='text-align:right'><b>" + Calc.formatarMoeda(l.total) + "</b></td></tr>";
+    }).join("");
+    var logoData = localStorage.getItem(LOGO_KEY);
+    var logoHtml = logoData ? '<img src="' + logoData + '" style="max-height:50px;margin-bottom:8px" alt="Logo">' : '';
+    var html = '<div style="font-family:Arial,sans-serif;padding:24px;color:#1F1833">' +
+      logoHtml +
+      '<h1 style="color:#FF7A00;margin-bottom:4px">Relatório de Faturamento</h1>' +
+      '<p>Gerado em ' + new Date().toLocaleString("pt-BR") + '</p>' +
+      '<table style="width:100%;border-collapse:collapse;margin-top:16px" border="1" cellpadding="6">' +
+      '<thead style="background:#FF7A00;color:white"><tr><th>Data</th><th>Prato</th><th>Qtd</th><th>Preço Unit.</th><th>Total</th></tr></thead>' +
+      '<tbody>' + (linhas || '<tr><td colspan="5">Nenhum lançamento.</td></tr>') + '</tbody>' +
+      '<tfoot><tr><td colspan="4"><b>Total</b></td><td style="text-align:right"><b>' + Calc.formatarMoeda(totalFat) + '</b></td></tr></tfoot>' +
+      '</table></div>';
+    document.getElementById("fat-imprimivel").innerHTML = html;
+    document.getElementById("fat-imprimivel").style.display = "block";
+    document.getElementById("relatorio-imprimivel").innerHTML = "";
+    window.print();
+    setTimeout(function () {
+      document.getElementById("fat-imprimivel").style.display = "none";
+    }, 1000);
+  });
+
+  // ─── Exportar Excel faturamento ─────────────────────
+  document.getElementById("btn-fat-excel").addEventListener("click", function () {
+    var lista = getLancamentosFiltrados();
+    var ordenados = lista.slice().sort(function (a, b) { return b.data.localeCompare(a.data); });
+    var rows = [gerarLinhaXml(["Data", "Prato", "Quantidade", "Preço Unitário", "Total"])];
+    ordenados.forEach(function (l) {
+      var dataFmt = l.data ? l.data.split("-").reverse().join("/") : "-";
+      rows.push(gerarLinhaXml([dataFmt, l.pratoNome, l.qtd, Number(l.precoUnitario.toFixed(2)), Number(l.total.toFixed(2))]));
+    });
+    var total = lista.reduce(function (s, l) { return s + l.total; }, 0);
+    rows.push(gerarLinhaXml(["TOTAL", "", "", "", Number(total.toFixed(2))]));
+
+    var xml = '<?xml version="1.0"?>\n<?mso-application progid="Excel.Sheet"?>\n' +
+      '<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" ' +
+      'xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+      'xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\n' +
+      '<Worksheet ss:Name="Faturamento"><Table>' + rows.join("") + '</Table></Worksheet>' +
+      '\n</Workbook>';
+
+    baixarArquivo(xml, "faturamento_" + dataParaArquivo() + ".xls", "application/vnd.ms-excel");
+    mostrarToast("Planilha de faturamento gerada.");
+  });
+
+  // ─── Define data padrão de hoje no formulário ─────
+  var hoje = new Date().toISOString().slice(0, 10);
+  document.getElementById("fat-data").value = hoje;
 
   // Init
   inicializarTema();
