@@ -213,6 +213,17 @@
   // Navegação entre abas
   // ------------------------------------------------------------------- //
 
+  var titulosSecao = {
+    ingredientes: "🥕 Ingredientes",
+    pratos: "🍽️ Pratos",
+    faturamento: "💰 Faturamento",
+    custosfixos: "📉 Custos Fixos / PE",
+    payback: "📈 Payback Descontado",
+    relatorios: "📊 Relatórios",
+    config: "⚙️ Configurações",
+    importar: "📥 Importar / Exportar"
+  };
+
   function fecharSidebarMobile() {
     document.getElementById("sidebar").classList.remove("aberta");
     document.getElementById("sidebar-overlay").classList.remove("ativo");
@@ -228,6 +239,10 @@
       b.classList.toggle("ativa", ativa);
       b.setAttribute("aria-selected", ativa ? "true" : "false");
     });
+    var badge = document.getElementById("topo-secao-badge");
+    if (badge && titulosSecao[vista]) {
+      badge.textContent = titulosSecao[vista];
+    }
     fecharSidebarMobile();
     if (vista === "ingredientes") renderIngredientes();
     if (vista === "pratos") { mostrarListaPratos(); renderPratosLista(); }
@@ -1110,18 +1125,58 @@
     b.addEventListener("click", function () { irPara(b.getAttribute("data-vista")); });
   });
 
-  // ─── Sidebar mobile toggle ────────────────────────
+  // ─── Sidebar mobile & desktop toggle ────────────────
   var btnMenu = document.getElementById("btn-menu");
   var sidebar = document.getElementById("sidebar");
   var overlay = document.getElementById("sidebar-overlay");
+  var btnFecharSidebar = document.getElementById("btn-fechar-sidebar");
+  var btnRecolherSidebar = document.getElementById("btn-recolher-sidebar");
+  var SIDEBAR_RECOLHIDA_KEY = "precifica_sidebar_recolhida";
+
+  function atualizarLabelRecolher(isRecolhida) {
+    var label = document.getElementById("recolher-label");
+    if (label) label.textContent = isRecolhida ? "Expandir" : "Recolher";
+  }
+
+  function inicializarSidebarRecolhida() {
+    var recolhida = localStorage.getItem(SIDEBAR_RECOLHIDA_KEY) === "true";
+    if (window.innerWidth >= 1024 && recolhida) {
+      document.body.classList.add("sidebar-recolhida");
+      atualizarLabelRecolher(true);
+    }
+  }
+
+  function alternarSidebarRecolhida() {
+    var isRecolhida = document.body.classList.toggle("sidebar-recolhida");
+    localStorage.setItem(SIDEBAR_RECOLHIDA_KEY, isRecolhida ? "true" : "false");
+    atualizarLabelRecolher(isRecolhida);
+  }
 
   btnMenu.addEventListener("click", function () {
-    var aberta = sidebar.classList.toggle("aberta");
-    overlay.classList.toggle("ativo", aberta);
-    btnMenu.setAttribute("aria-expanded", aberta ? "true" : "false");
+    if (window.innerWidth >= 1024) {
+      alternarSidebarRecolhida();
+    } else {
+      var aberta = sidebar.classList.toggle("aberta");
+      overlay.classList.toggle("ativo", aberta);
+      btnMenu.setAttribute("aria-expanded", aberta ? "true" : "false");
+    }
   });
 
+  if (btnFecharSidebar) {
+    btnFecharSidebar.addEventListener("click", fecharSidebarMobile);
+  }
+
+  if (btnRecolherSidebar) {
+    btnRecolherSidebar.addEventListener("click", alternarSidebarRecolhida);
+  }
+
   overlay.addEventListener("click", fecharSidebarMobile);
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && sidebar.classList.contains("aberta")) {
+      fecharSidebarMobile();
+    }
+  });
 
   // Botão tema mobile
   var btnTemaMobile = document.getElementById("btn-tema-mobile");
@@ -1454,6 +1509,7 @@
 
   // Init
   inicializarTema();
+  inicializarSidebarRecolhida();
   carregarLogo();
   irPara("ingredientes");
 

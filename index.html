@@ -20,38 +20,39 @@
         <span class="sidebar-brand-icon">🦀</span>
         <span class="sidebar-brand-name">Precifica<span class="marca-plus">+</span></span>
       </div>
+      <button type="button" class="btn-fechar-sidebar" id="btn-fechar-sidebar" aria-label="Fechar menu" title="Fechar menu">✕</button>
     </div>
 
     <nav class="sidebar-nav" role="tablist" aria-label="Seções do sistema">
-      <button class="sidebar-item" data-vista="ingredientes" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="ingredientes" role="tab" aria-selected="false" title="Ingredientes">
         <span class="sidebar-icon">🥕</span>
         <span class="sidebar-label">Ingredientes</span>
       </button>
-      <button class="sidebar-item" data-vista="pratos" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="pratos" role="tab" aria-selected="false" title="Pratos">
         <span class="sidebar-icon">🍽️</span>
         <span class="sidebar-label">Pratos</span>
       </button>
-      <button class="sidebar-item" data-vista="faturamento" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="faturamento" role="tab" aria-selected="false" title="Faturamento">
         <span class="sidebar-icon">💰</span>
         <span class="sidebar-label">Faturamento</span>
       </button>
-      <button class="sidebar-item" data-vista="custosfixos" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="custosfixos" role="tab" aria-selected="false" title="Custos fixos / PE">
         <span class="sidebar-icon">📉</span>
         <span class="sidebar-label">Custos fixos / PE</span>
       </button>
-      <button class="sidebar-item" data-vista="payback" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="payback" role="tab" aria-selected="false" title="Payback Descontado">
         <span class="sidebar-icon">📈</span>
         <span class="sidebar-label">Payback Descontado</span>
       </button>
-      <button class="sidebar-item" data-vista="relatorios" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="relatorios" role="tab" aria-selected="false" title="Relatórios">
         <span class="sidebar-icon">📊</span>
         <span class="sidebar-label">Relatórios</span>
       </button>
-      <button class="sidebar-item" data-vista="config" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="config" role="tab" aria-selected="false" title="Configurações">
         <span class="sidebar-icon">⚙️</span>
         <span class="sidebar-label">Configurações</span>
       </button>
-      <button class="sidebar-item" data-vista="importar" role="tab" aria-selected="false">
+      <button class="sidebar-item" data-vista="importar" role="tab" aria-selected="false" title="Importar / Exportar">
         <span class="sidebar-icon">📥</span>
         <span class="sidebar-label">Importar / Exportar</span>
       </button>
@@ -62,6 +63,10 @@
         <span class="tema-icone" id="tema-icone">☀️</span>
         <span class="tema-label" id="tema-label">Tema</span>
       </button>
+      <button type="button" class="btn-recolher-sidebar" id="btn-recolher-sidebar" aria-label="Recolher menu lateral" title="Recolher ou expandir menu lateral">
+        <span class="recolher-icone" id="recolher-icone">◀</span>
+        <span class="recolher-label" id="recolher-label">Recolher</span>
+      </button>
       <p class="sidebar-versao">100% local · sem servidor</p>
     </div>
   </aside>
@@ -69,24 +74,29 @@
   <!-- Overlay mobile -->
   <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
 
-  <!-- ================= TOPO MOBILE ================= -->
-  <header class="topo" id="topo">
-    <button type="button" class="btn-menu" id="btn-menu" aria-label="Abrir menu" aria-expanded="false" aria-controls="sidebar">
-      <span class="hamburger"></span>
-      <span class="hamburger"></span>
-      <span class="hamburger"></span>
-    </button>
-    <div class="topo-brand">
-      <span>🦀</span>
-      <strong>Precifica<span class="marca-plus">+</span></strong>
-    </div>
-    <button type="button" class="btn-tema btn-tema-mobile" id="btn-tema-mobile" aria-label="Alternar tema">
-      <span class="tema-icone" id="tema-icone-mobile">☀️</span>
-    </button>
-  </header>
-
   <!-- ================= CONTEÚDO PRINCIPAL ================= -->
   <div class="conteudo-principal" id="conteudo-principal">
+    <!-- Topo app bar responsivo embutido no conteúdo principal -->
+    <header class="topo" id="topo">
+      <div class="topo-esquerda">
+        <button type="button" class="btn-menu" id="btn-menu" aria-label="Abrir menu lateral" aria-expanded="false" aria-controls="sidebar">
+          <span class="hamburger"></span>
+          <span class="hamburger"></span>
+          <span class="hamburger"></span>
+        </button>
+        <div class="topo-brand">
+          <span class="topo-brand-icon">🦀</span>
+          <span class="topo-brand-name">Precifica<span class="marca-plus">+</span></span>
+        </div>
+        <span class="topo-secao-badge" id="topo-secao-badge">🥕 Ingredientes</span>
+      </div>
+      <div class="topo-direita">
+        <button type="button" class="btn-tema btn-tema-mobile" id="btn-tema-mobile" aria-label="Alternar tema" title="Alternar tema">
+          <span class="tema-icone" id="tema-icone-mobile">☀️</span>
+        </button>
+      </div>
+    </header>
+
     <main>
 
       <!-- ================= INGREDIENTES ================= -->
