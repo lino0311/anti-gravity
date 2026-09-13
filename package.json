@@ -1,0 +1,19 @@
+{
+  "name": "precifica-mais",
+  "version": "1.0.0",
+  "description": "Sistema moderno de precificação de cardápio, ficha técnica e ponto de equilíbrio",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes serve .",
+    "dev": "npx --yes serve ."
+  },
+  "keywords": [
+    "precificacao",
+    "restaurante",
+    "ficha-tecnica",
+    "cardapio",
+    "ponto-de-equilibrio"
+  ],
+  "author": "Alan Carvalho",
+  "license": "MIT"
+}
